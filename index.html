@@ -2,52 +2,69 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>🎅 Santa GPS Bug Discovery – Debasish's Gift Hunt</title>
 <style>
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', Consolas, monospace;
-  background: #000;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', sans-serif;
+  background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
   color: #e6edf3;
   overflow-x: hidden;
   position: relative;
+  min-height: 100vh;
 }
 
-/* Starry Background */
+/* Enhanced Starry Background */
 .stars {
   position: fixed;
   width: 100%;
   height: 100%;
   background: transparent;
   z-index: 0;
+  pointer-events: none;
 }
 
 .star {
   position: absolute;
-  width: 2px;
-  height: 2px;
   background: #fff;
   border-radius: 50%;
   animation: twinkle 3s infinite;
 }
 
-@keyframes twinkle {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
+.star.small {
+  width: 1px;
+  height: 1px;
 }
 
-/* Snowflakes */
+.star.medium {
+  width: 2px;
+  height: 2px;
+}
+
+.star.large {
+  width: 3px;
+  height: 3px;
+  box-shadow: 0 0 4px #fff;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Enhanced Snowflakes */
 .snow {
   position: fixed;
-  top: -100%;
+  top: -10%;
   left: 0;
   width: 100%;
-  height: 200%;
+  height: 110%;
   pointer-events: none;
   z-index: 2;
 }
@@ -55,23 +72,37 @@ body {
 .snowflake {
   position: absolute;
   color: #fff;
-  font-size: 1em;
+  user-select: none;
   animation: fall linear infinite;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 }
 
 @keyframes fall {
-  to { transform: translateY(100vh); }
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.95); }
 }
 
 /* Screen Management */
 .screen {
   display: none;
-  padding: 24px;
+  padding: 16px;
   min-height: 100vh;
   box-sizing: border-box;
   position: relative;
@@ -84,30 +115,41 @@ body {
   justify-content: center;
 }
 
-/* Card Styling */
+/* Card Styling - Responsive */
 .card {
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
   border-radius: 20px;
-  padding: 32px;
+  padding: 24px;
   max-width: 900px;
   width: 100%;
   border: 2px solid rgba(59, 130, 246, 0.3);
   box-shadow: 0 0 60px rgba(59, 130, 246, 0.2), inset 0 0 40px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  margin: 10px;
 }
 
-/* Buttons */
+/* Buttons - Touch Friendly */
 .btn {
-  margin: 8px;
-  padding: 14px 28px;
+  margin: 6px;
+  padding: 14px 24px;
   border-radius: 12px;
   border: none;
   cursor: pointer;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 14px;
   transition: all 0.3s;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  width: 100%;
+  max-width: 100%;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
 }
 
 .btn:hover {
@@ -147,24 +189,26 @@ body {
   background: linear-gradient(135deg, #dc2626, #b91c1c);
 }
 
-/* Map Visualization */
+/* Map Visualization - Responsive */
 .map {
   background: linear-gradient(135deg, #1e293b, #0f172a);
   border-radius: 14px;
-  padding: 18px;
-  margin-top: 18px;
+  padding: 12px;
+  margin-top: 16px;
   position: relative;
-  height: 280px;
+  height: 200px;
   border: 2px solid rgba(59, 130, 246, 0.2);
   box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
 }
 
 .route {
   position: absolute;
-  left: 40px;
-  right: 40px;
-  top: 140px;
-  height: 6px;
+  left: 30px;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
   background: linear-gradient(90deg, #3b82f6, #8b5cf6);
   border-radius: 3px;
   box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
@@ -172,30 +216,32 @@ body {
 
 .santa {
   position: absolute;
-  top: 110px;
-  left: 40px;
-  font-size: 40px;
+  top: 50%;
+  left: 30px;
+  transform: translateY(-50%);
+  font-size: 32px;
   transition: left 1s;
   filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
   animation: bounce 1s infinite;
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%, 100% { transform: translateY(-50%); }
+  50% { transform: translateY(calc(-50% - 8px)); }
 }
 
 .marker {
   position: absolute;
-  top: 86px;
-  right: 40px;
-  font-size: 28px;
+  top: 50%;
+  right: 30px;
+  transform: translateY(-50%);
+  font-size: 24px;
   animation: ping 2s infinite;
 }
 
 @keyframes ping {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.1); opacity: 0.8; }
+  0%, 100% { transform: translateY(-50%) scale(1); opacity: 1; }
+  50% { transform: translateY(-50%) scale(1.1); opacity: 0.8; }
 }
 
 /* Status Indicators */
@@ -208,21 +254,23 @@ body {
 
 @keyframes blink {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  50% { opacity: 0.4; }
 }
 
-/* Terminal */
+/* Terminal - Responsive */
 .terminal {
   background: #000;
   color: #00ff9c;
-  padding: 20px;
-  height: 70vh;
-  font-size: 14px;
+  padding: 16px;
+  height: 60vh;
+  max-height: 500px;
+  font-size: 12px;
   overflow-y: auto;
   border-radius: 12px;
   box-shadow: inset 0 0 40px rgba(0, 255, 156, 0.1);
   animation: flicker 1.4s infinite alternate;
   border: 2px solid rgba(0, 255, 156, 0.3);
+  font-family: 'Courier New', monospace;
 }
 
 @keyframes flicker {
@@ -231,9 +279,10 @@ body {
 }
 
 .log {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   opacity: 0;
   animation: fadeIn 0.5s forwards;
+  line-height: 1.4;
 }
 
 @keyframes fadeIn {
@@ -253,7 +302,7 @@ body {
 /* Bug Report Cards */
 .bug-card {
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98));
-  padding: 20px;
+  padding: 16px;
   border-radius: 12px;
   margin: 12px 0;
   border-left: 4px solid #ef4444;
@@ -272,7 +321,7 @@ body {
 /* Test Cases */
 .test-case {
   background: rgba(15, 23, 42, 0.8);
-  padding: 16px;
+  padding: 14px;
   border-radius: 10px;
   margin: 10px 0;
   border: 1px solid rgba(59, 130, 246, 0.3);
@@ -291,9 +340,9 @@ body {
 /* Progress Bar */
 .progress {
   background: rgba(30, 41, 59, 0.5);
-  height: 8px;
+  height: 6px;
   border-radius: 10px;
-  margin: 20px 0;
+  margin: 16px 0;
   overflow: hidden;
 }
 
@@ -317,51 +366,69 @@ body {
 
 @keyframes shake {
   0% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  50% { transform: translateX(4px); }
-  75% { transform: translateX(-4px); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-6px); }
   100% { transform: translateX(0); }
 }
 
 /* Gift Box */
 .gift-box {
-  font-size: 80px;
+  font-size: 60px;
   text-align: center;
   animation: float 3s ease-in-out infinite;
   filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.6));
+  margin: 10px 0;
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
+  50% { transform: translateY(-15px); }
 }
 
 /* Confetti */
 .confetti {
   position: fixed;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   top: -10px;
   z-index: 999;
   animation: confetti-fall 3s linear;
+  border-radius: 2px;
 }
 
 @keyframes confetti-fall {
   to {
-    transform: translateY(100vh) rotate(360deg);
+    transform: translateY(100vh) rotate(720deg);
     opacity: 0;
   }
 }
 
-/* Typography */
-h1, h2 {
+/* Typography - Responsive */
+h1 {
   text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
   margin-top: 0;
+  font-size: 24px;
+  line-height: 1.3;
 }
 
 h2 {
-  font-size: 28px;
-  margin-bottom: 20px;
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  margin-top: 0;
+  font-size: 22px;
+  margin-bottom: 16px;
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: 18px;
+  margin: 12px 0;
+}
+
+p {
+  line-height: 1.6;
+  margin: 10px 0;
+  font-size: 15px;
 }
 
 .highlight {
@@ -371,64 +438,222 @@ h2 {
 
 .code {
   background: rgba(0, 0, 0, 0.4);
-  padding: 2px 8px;
+  padding: 2px 6px;
   border-radius: 4px;
-  font-family: monospace;
+  font-family: 'Courier New', monospace;
   color: #10b981;
+  font-size: 13px;
 }
 
 ul {
-  line-height: 1.8;
+  line-height: 1.6;
+  padding-left: 24px;
+  margin: 10px 0;
 }
 
 li {
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+ol {
+  padding-left: 24px;
+  margin: 10px 0;
+}
+
+ol li {
   margin: 8px 0;
+  line-height: 1.5;
 }
 
 .intro-text {
-  font-size: 18px;
-  line-height: 1.8;
-  margin: 20px 0;
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 16px 0;
 }
 
 .mission-badge {
   display: inline-block;
   background: linear-gradient(135deg, #f59e0b, #d97706);
-  padding: 8px 16px;
+  padding: 8px 14px;
   border-radius: 20px;
   font-weight: 700;
   margin: 10px 0;
   box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+  font-size: 13px;
 }
 
-/* Responsive */
+/* Alert Warning */
+.map-warning {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: #f59e0b;
+  font-weight: 700;
+  animation: pulse 1s infinite;
+  font-size: 11px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* Scrollbar Styling */
+.terminal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.terminal::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 156, 0.3);
+  border-radius: 4px;
+}
+
+/* Mobile Optimizations */
 @media (max-width: 768px) {
   .card {
     padding: 20px;
-    margin: 10px;
+    margin: 8px;
+    border-radius: 16px;
+  }
+  
+  h1 {
+    font-size: 22px;
   }
   
   h2 {
-    font-size: 22px;
+    font-size: 20px;
+    margin-bottom: 14px;
+  }
+  
+  h3 {
+    font-size: 16px;
+  }
+  
+  p, .intro-text {
+    font-size: 14px;
   }
   
   .btn {
     padding: 12px 20px;
-    font-size: 14px;
+    font-size: 13px;
+    margin: 5px;
   }
   
   .map {
-    height: 200px;
+    height: 160px;
+    padding: 10px;
+  }
+  
+  .santa {
+    font-size: 28px;
+  }
+  
+  .marker {
+    font-size: 20px;
+  }
+  
+  .route {
+    left: 20px;
+    right: 20px;
+    height: 3px;
+  }
+  
+  .gift-box {
+    font-size: 50px;
+  }
+  
+  .terminal {
+    font-size: 11px;
+    padding: 12px;
+    height: 50vh;
+  }
+  
+  .test-case, .bug-card {
+    padding: 12px;
+  }
+  
+  li {
+    font-size: 13px;
+  }
+  
+  .code {
+    font-size: 12px;
+  }
+  
+  .mission-badge {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  
+  .map-warning {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .screen {
+    padding: 12px;
+  }
+  
+  .card {
+    padding: 16px;
+    margin: 6px;
+  }
+  
+  h1 {
+    font-size: 20px;
+  }
+  
+  h2 {
+    font-size: 18px;
+  }
+  
+  .btn {
+    font-size: 12px;
+    padding: 11px 18px;
+  }
+  
+  .map {
+    height: 140px;
+  }
+  
+  .santa {
+    font-size: 24px;
+    left: 20px;
+  }
+  
+  .marker {
+    font-size: 18px;
+    right: 20px;
+  }
+  
+  .terminal {
+    font-size: 10px;
+  }
+}
+
+/* Landscape Mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .terminal {
+    height: 70vh;
+  }
+  
+  .map {
+    height: 120px;
   }
 }
 </style>
 </head>
 <body>
 
-<!-- Stars Background -->
+<!-- Enhanced Stars Background -->
 <div class="stars" id="stars"></div>
 
-<!-- Snowflakes -->
+<!-- Enhanced Snowflakes -->
 <div class="snow" id="snow"></div>
 
 <!-- INTRO SCREEN -->
@@ -449,20 +674,20 @@ li {
 <div class="screen" id="gps">
   <div class="card">
     <h2>🎅 Santa Navigation System – Live Route</h2>
-    <p><b>Status:</b> <span class="error">⚠️ CRITICAL FAILURE DETECTED</span></p>
+    <p><b>Status:</b> <span class="error">⚠️ CRITICAL FAILURE</span></p>
     <p>Santa attempted Guwahati shortcuts but the navigation system entered an <span class="highlight">infinite loop</span>. He's stuck circling the same flyover!</p>
     <div class="map" id="map">
       <div class="route"></div>
       <div class="santa" id="santa">🎅</div>
-      <div class="marker">📍 Boldtek Office</div>
-      <div style="position:absolute;top:20px;left:20px;color:#f59e0b;font-weight:700;animation:pulse 1s infinite;">⚠️ REROUTING LOOP</div>
+      <div class="marker">📍 Boldtek</div>
+      <div class="map-warning">⚠️ REROUTING LOOP</div>
     </div>
     <div class="test-case test-fail">
       <b>🚧 Observed Issues:</b>
       <ul style="margin:8px 0">
         <li>GPS recalculates same route every 30 seconds</li>
-        <li>Flyover shown as OPEN in map data (actually under construction)</li>
-        <li>ETA stuck at "5 minutes away" for 2 hours</li>
+        <li>Flyover shown as OPEN (actually under construction)</li>
+        <li>ETA stuck at "5 minutes" for 2 hours</li>
         <li>Route alternates between 3 paths endlessly</li>
       </ul>
     </div>
@@ -479,28 +704,28 @@ li {
     <div class="test-case">
       <b>📊 System Logs Analysis:</b>
       <ul>
-        <li>GPS signal strength: <span class="code">STRONG (98%)</span></li>
-        <li>Map data version: <span class="code">v2.1.3 (Outdated)</span></li>
+        <li>GPS signal: <span class="code">STRONG (98%)</span></li>
+        <li>Map data: <span class="code">v2.1.3 (Outdated)</span></li>
         <li>Routing firmware: <span class="code">v1.8.2</span></li>
-        <li>Traffic API: <span class="code">Responding with cached data</span></li>
-        <li>Road construction database: <span class="code">Last updated 6 months ago</span></li>
+        <li>Traffic API: <span class="code">Cached data</span></li>
+        <li>Road DB: <span class="code">6 months old</span></li>
       </ul>
     </div>
 
     <div class="test-case test-fail">
       <b>🔴 Failed Test Cases:</b>
       <ul>
-        <li><code>TC-001:</code> Route should avoid blocked roads ❌</li>
-        <li><code>TC-002:</code> ETA should update dynamically ❌</li>
-        <li><code>TC-003:</code> System should not enter infinite loops ❌</li>
+        <li><code>TC-001:</code> Route avoids blocked roads ❌</li>
+        <li><code>TC-002:</code> ETA updates dynamically ❌</li>
+        <li><code>TC-003:</code> No infinite loops ❌</li>
       </ul>
     </div>
 
     <p><b>What's the ACTUAL root cause?</b></p>
-    <button class="btn secondary" onclick="discover(false,'UI')">🖥️ Frontend UI map rendering glitch</button><br/>
-    <button class="btn secondary" onclick="discover(false,'GPS')">📡 GPS signal interference from weather</button><br/>
-    <button class="btn secondary" onclick="discover(false,'Traffic')">🚦 Traffic API timeout issues</button><br/>
-    <button class="btn primary" onclick="discover(true,'Root')">🎯 Stale road-state data + routing algorithm conflict</button>
+    <button class="btn secondary" onclick="discover(false,'UI')">🖥️ UI rendering glitch</button>
+    <button class="btn secondary" onclick="discover(false,'GPS')">📡 GPS signal interference</button>
+    <button class="btn secondary" onclick="discover(false,'Traffic')">🚦 Traffic API timeout</button>
+    <button class="btn primary" onclick="discover(true,'Root')">🎯 Stale data + routing conflict</button>
   </div>
 </div>
 
@@ -512,15 +737,15 @@ li {
     
     <div class="bug-card severity-critical">
       <p><b>🐛 Bug ID:</b> <span class="code">SANTA-GPS-2024-CRITICAL</span></p>
-      <p><b>Title:</b> Infinite reroute loop on Guwahati flyover routes</p>
-      <p><b>Severity:</b> <span class="error">CRITICAL</span> - Blocking Santa's delivery!</p>
-      <p><b>Reported by:</b> Debasish (QA Team, Boldtek)</p>
+      <p><b>Title:</b> Infinite reroute loop on Guwahati flyover</p>
+      <p><b>Severity:</b> <span class="error">CRITICAL</span></p>
+      <p><b>Reported by:</b> Debasish (QA, Boldtek)</p>
       <p><b>Environment:</b> Production - Santa's Sleigh v3.0</p>
     </div>
 
     <div class="test-case">
       <b>🔍 Root Cause:</b>
-      <p>The navigation system's routing algorithm is using <span class="highlight">outdated road-state data</span> (6 months old) which shows the flyover as open. When firmware v1.8.2 tries to calculate the route, it picks the "fastest" path (blocked flyover), encounters a conflict with real-time GPS positioning, then recalculates - creating an infinite loop.</p>
+      <p>The routing algorithm uses <span class="highlight">outdated road-state data</span> (6 months old) showing the flyover as open. When firmware v1.8.2 calculates the route, it picks the blocked flyover as "fastest", encounters a GPS conflict, then recalculates - creating an infinite loop.</p>
     </div>
 
     <div class="test-case test-pass">
@@ -536,7 +761,7 @@ li {
     <div class="progress">
       <div class="progress-bar" style="width:0%" id="reportProgress"></div>
     </div>
-    <p style="text-align:center;color:#3b82f6" id="reportStatus">Ready to submit...</p>
+    <p style="text-align:center;color:#3b82f6;font-size:14px" id="reportStatus">Ready to submit...</p>
 
     <button class="btn primary" onclick="submitReport()" id="submitBtn">🚀 Submit & Apply Fix</button>
   </div>
@@ -559,10 +784,10 @@ li {
         <li><code>TC-001:</code> Route avoids blocked roads ✅</li>
         <li><code>TC-002:</code> ETA updates correctly ✅</li>
         <li><code>TC-003:</code> No infinite loops detected ✅</li>
-        <li><code>TC-004:</code> Navigation stable for 5 minutes ✅</li>
+        <li><code>TC-004:</code> Navigation stable ✅</li>
       </ul>
     </div>
-    <p style="font-size:20px;text-align:center;margin:20px 0">🎅 Santa's GPS is back online! He's heading to Boldtek now!</p>
+    <p style="font-size:18px;text-align:center;margin:16px 0">🎅 Santa's GPS is back online! He's heading to Boldtek now!</p>
     <button class="btn primary" onclick="next('tracking')">📍 Track Santa's Arrival</button>
   </div>
 </div>
@@ -570,18 +795,18 @@ li {
 <!-- TRACKING SCREEN -->
 <div class="screen" id="tracking">
   <div class="card">
-    <h2>🛷 Santa En Route to Boldtek Office</h2>
-    <div class="map" style="height:200px">
+    <h2>🛷 Santa En Route to Boldtek</h2>
+    <div class="map" style="height:180px">
       <div class="route"></div>
-      <div class="santa" id="santa2" style="left:40px">🎅</div>
+      <div class="santa" id="santa2" style="left:30px">🎅</div>
       <div class="marker">📍 Boldtek</div>
-      <div style="position:absolute;top:20px;left:20px;color:#10b981;font-weight:700">✅ ROUTE OPTIMAL</div>
+      <div class="map-warning" style="color:#10b981">✅ ROUTE OPTIMAL</div>
     </div>
     <div class="progress">
       <div class="progress-bar" style="width:0%" id="deliveryProgress"></div>
     </div>
-    <p style="text-align:center;font-size:18px;color:#3b82f6" id="deliveryStatus">Santa is traveling...</p>
-    <p style="text-align:center;margin-top:20px"><span class="code" id="eta">ETA: Calculating...</span></p>
+    <p style="text-align:center;font-size:16px;color:#3b82f6" id="deliveryStatus">Santa is traveling...</p>
+    <p style="text-align:center;margin-top:16px"><span class="code" id="eta">ETA: Calculating...</span></p>
   </div>
 </div>
 
@@ -591,34 +816,34 @@ li {
     <div class="gift-box">🎁</div>
     <h1 style="text-align:center;color:#10b981">DELIVERY COMPLETE! 🎉</h1>
     <div class="test-case test-pass">
-      <p style="text-align:center;font-size:20px"><b>Santa has successfully reached Boldtek Office!</b></p>
+      <p style="text-align:center;font-size:16px"><b>Santa has successfully reached Boldtek Office!</b></p>
     </div>
     
-    <div style="background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(59,130,246,.2));padding:24px;border-radius:12px;margin:20px 0;border:2px solid #10b981">
+    <div style="background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(59,130,246,.2));padding:20px;border-radius:12px;margin:16px 0;border:2px solid #10b981">
       <h3>🎁 Your Secret Santa Gift Location:</h3>
-      <ul style="font-size:16px">
+      <ul style="font-size:14px">
         <li>📍 <b>Building:</b> Boldtek Office - Main Floor</li>
         <li>🏢 <b>Area:</b> Common area / Reception zone</li>
-        <li>🪑 <b>Landmark:</b> Near the pantry or reception desk</li>
-        <li>🎀 <b>Look for:</b> A gift wrapped in festive red paper</li>
-        <li>🧥 <b>Contents:</b> A special jacket, chosen just for you!</li>
+        <li>🪑 <b>Landmark:</b> Near pantry or reception desk</li>
+        <li>🎀 <b>Look for:</b> Gift wrapped in festive red paper</li>
+        <li>🧥 <b>Contents:</b> A special jacket, chosen for you!</li>
       </ul>
     </div>
 
-    <div style="text-align:center;margin-top:30px">
+    <div style="text-align:center;margin-top:24px">
       <h2>🎅 Ho Ho Ho!</h2>
-      <p style="font-size:18px;line-height:1.8">
+      <p style="font-size:16px;line-height:1.7">
         <b>Thank you, Debasish!</b><br/>
         Your exceptional QA skills saved Christmas! 🎄<br/>
-        Without your debugging expertise, Santa would still be<br/>
-        circling that flyover in an infinite loop! 😄
+        Without your debugging expertise, Santa would<br class="hide-mobile"/>
+        still be circling that flyover! 😄
       </p>
-      <div class="mission-badge" style="background:linear-gradient(135deg,#10b981,#059669);margin-top:20px">
+      <div class="mission-badge" style="background:linear-gradient(135deg,#10b981,#059669);margin-top:16px">
         ✅ MISSION ACCOMPLISHED
       </div>
-      <p style="margin-top:20px;color:#94a3b8">
+      <p style="margin-top:16px;color:#94a3b8;font-size:14px">
         <i>From your Secret Santa with love ❤️</i><br/>
-        <span style="font-size:12px">Bug Report Status: RESOLVED ✅ | Severity: CRITICAL → FIXED</span>
+        <span style="font-size:11px">Bug Status: RESOLVED ✅ | CRITICAL → FIXED</span>
       </p>
     </div>
   </div>
@@ -634,210 +859,213 @@ let screens = document.querySelectorAll('.screen');
 function next(id) {
   screens.forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
   if (id === 'terminal') runLogs();
   if (id === 'tracking') trackDelivery();
 }
 
-// Create starry background
+// Create enhanced starry background
 let starsContainer = document.getElementById('stars');
-for (let i = 0; i < 100; i++) {
+let starSizes = ['small', 'small', 'small', 'medium', 'medium', 'large'];
+for (let i = 0; i < 150; i++) {
   let star = document.createElement('div');
-  star.className = 'star';
+  star.className = 'star ' + starSizes[Math.floor(Math.random() * starSizes.length)];
   star.style.left = Math.random() * 100 + '%';
   star.style.top = Math.random() * 100 + '%';
   star.style.animationDelay = Math.random() * 3 + 's';
   starsContainer.appendChild(star);
 }
-
-// Create snowflakes
+// Create enhanced snowflakes with varied sizes
 let snowContainer = document.getElementById('snow');
-for (let i = 0; i < 50; i++) {
-  let flake = document.createElement('div');
-  flake.className = 'snowflake';
-  flake.textContent = '❄';
-  flake.style.left = Math.random() * 100 + '%';
-  flake.style.animationDuration = (Math.random() * 3 + 2) + 's';
-  flake.style.animationDelay = Math.random() * 5 + 's';
-  flake.style.fontSize = (Math.random() * 0.5 + 0.5) + 'em';
-  flake.style.opacity = Math.random() * 0.6 + 0.4;
-  snowContainer.appendChild(flake);
+let snowChars = ['❄', '❅', '❆'];
+for (let i = 0; i < 60; i++) {
+let flake = document.createElement('div');
+flake.className = 'snowflake';
+flake.textContent = snowChars[Math.floor(Math.random() * snowChars.length)];
+flake.style.left = Math.random() * 100 + '%';
+flake.style.animationDuration = (Math.random() * 4 + 4) + 's';
+flake.style.animationDelay = Math.random() * 8 + 's';
+flake.style.fontSize = (Math.random() * 0.7 + 0.5) + 'em';
+flake.style.opacity = Math.random() * 0.5 + 0.4;
+snowContainer.appendChild(flake);
 }
-
 // ==========================================
 // GPS SCREEN ANIMATIONS
 // ==========================================
-
 // Santa bouncing animation on GPS screen
 let s = document.getElementById('santa');
-let pos = 40;
+let pos = 30;
 let direction = 1;
-setInterval(() => {
-  if (pos >= 320) direction = -1;
-  if (pos <= 40) direction = 1;
-  pos += 8 * direction;
-  s.style.left = pos + 'px';
-}, 900);
-
+let mapWidth = window.innerWidth > 768 ? 320 : 200;
+function updateSantaPosition() {
+let currentMapWidth = window.innerWidth > 768 ? 320 : window.innerWidth > 480 ? 250 : 200;
+if (pos >= currentMapWidth) direction = -1;
+if (pos <= 30) direction = 1;
+pos += 6 * direction;
+s.style.left = pos + 'px';
+}
+setInterval(updateSantaPosition, 900);
+// Update on window resize
+window.addEventListener('resize', () => {
+mapWidth = window.innerWidth > 768 ? 320 : window.innerWidth > 480 ? 250 : 200;
+});
 // ==========================================
 // BUG DISCOVERY LOGIC
 // ==========================================
-
 let attempts = 0;
 function discover(correct, type) {
-  attempts++;
-  if (correct) {
-    next('report');
-  } else {
-    let card = document.querySelector('#analysis .card');
-    card.classList.add('shake');
-    setTimeout(() => card.classList.remove('shake'), 500);
-    let msgs = [
-      '❌ Not quite! Think about the data layer...',
-      '❌ Close, but dig deeper into the logs...',
-      '❌ Remember - check the root cause, not just symptoms!'
-    ];
-    alert(msgs[Math.min(attempts - 1, 2)]);
-  }
+attempts++;
+if (correct) {
+next('report');
+} else {
+let card = document.querySelector('#analysis .card');
+card.classList.add('shake');
+setTimeout(() => card.classList.remove('shake'), 500);
+let msgs = [
+'❌ Not quite! Think about the data layer...',
+'❌ Close, but dig deeper into the logs...',
+'❌ Remember - check the root cause, not symptoms!'
+];
+alert(msgs[Math.min(attempts - 1, 2)]);
 }
-
+}
 // ==========================================
 // BUG REPORT SUBMISSION
 // ==========================================
-
 function submitReport() {
-  let prog = document.getElementById('reportProgress');
-  let status = document.getElementById('reportStatus');
-  let btn = document.getElementById('submitBtn');
-  
-  btn.disabled = true;
-  btn.style.opacity = '0.5';
-  
-  let width = 0;
-  let interval = setInterval(() => {
-    width += 2;
-    prog.style.width = width + '%';
-    
-    if (width === 30) status.textContent = 'Validating bug report...';
-    if (width === 60) status.textContent = 'Prioritizing as CRITICAL...';
-    if (width === 90) status.textContent = 'Queueing system patch...';
-    
-    if (width >= 100) {
-      clearInterval(interval);
-      status.textContent = '✅ Report submitted successfully!';
-      status.style.color = '#10b981';
-      setTimeout(() => next('terminal'), 800);
-    }
-  }, 30);
-}
+let prog = document.getElementById('reportProgress');
+let status = document.getElementById('reportStatus');
+let btn = document.getElementById('submitBtn');
+btn.disabled = true;
+btn.style.opacity = '0.5';
+let width = 0;
+let interval = setInterval(() => {
+width += 2;
+prog.style.width = width + '%';
+if (width === 30) status.textContent = 'Validating bug report...';
+if (width === 60) status.textContent = 'Prioritizing as CRITICAL...';
+if (width === 90) status.textContent = 'Queueing system patch...';
 
+if (width >= 100) {
+  clearInterval(interval);
+  status.textContent = '✅ Report submitted successfully!';
+  status.style.color = '#10b981';
+  setTimeout(() => next('terminal'), 800);
+}
+}, 30);
+}
 // ==========================================
 // TERMINAL LOGS
 // ==========================================
-
 let logs = [
-  '[SYSTEM] Initializing Santa Navigation Core v1.3...',
-  '[SYSTEM] Loading Guwahati map data...',
-  '[WARNING] Detected stale road-state database (v2.1.3)',
-  '[PATCH] Downloading road-state update v3.0.1...',
-  '[PATCH] ████████████████████ 100% Complete',
-  '[SYSTEM] Updating traffic graph for Guwahati region...',
-  '[SYSTEM] Applying routing firmware patch v1.9.0...',
-  '[FIX] Clearing navigation cache...',
-  '[FIX] Purging outdated flyover route data...',
-  '[TEST] Running route calculation test...',
-  '[TEST] Validating against blocked roads database...',
-  '[SUCCESS] All route validations passed ✔',
-  '[SYSTEM] Recalculating optimal path to Boldtek Office...',
-  '[SUCCESS] New route calculated: 12.3 km, ETA 18 minutes ✔',
-  '[GPS] Locking onto Santa\'s sleigh position...',
-  '[GPS] Position locked: 26.1833°N, 91.7417°E ✔',
-  '[SYSTEM] Navigation system fully operational ✔',
-  '',
-  '═══════════════════════════════════════',
-  '✅ SYSTEM STATUS: OPERATIONAL',
-  '✅ ROUTE STATUS: OPTIMAL',
-  '✅ SANTA STATUS: EN ROUTE TO BOLDTEK',
-  '═══════════════════════════════════════'
+'[SYSTEM] Initializing Santa Navigation Core v1.3...',
+'[SYSTEM] Loading Guwahati map data...',
+'[WARNING] Detected stale road-state database (v2.1.3)',
+'[PATCH] Downloading road-state update v3.0.1...',
+'[PATCH] ████████████████████ 100% Complete',
+'[SYSTEM] Updating traffic graph for Guwahati region...',
+'[SYSTEM] Applying routing firmware patch v1.9.0...',
+'[FIX] Clearing navigation cache...',
+'[FIX] Purging outdated flyover route data...',
+'[TEST] Running route calculation test...',
+'[TEST] Validating against blocked roads database...',
+'[SUCCESS] All route validations passed ✔',
+'[SYSTEM] Recalculating optimal path to Boldtek Office...',
+'[SUCCESS] New route calculated: 12.3 km, ETA 18 min ✔',
+'[GPS] Locking onto Santas sleigh position...',
+'[GPS] Position locked: 26.1833°N, 91.7417°E ✔',
+'[SYSTEM] Navigation system fully operational ✔',
+'',
+'═══════════════════════════════════════',
+'✅ SYSTEM STATUS: OPERATIONAL',
+'✅ ROUTE STATUS: OPTIMAL',
+'✅ SANTA STATUS: EN ROUTE TO BOLDTEK',
+'═══════════════════════════════════════'
 ];
-
 let logEl = document.getElementById('log');
 function runLogs() {
-  let i = 0;
-  let interval = setInterval(() => {
-    let d = document.createElement('div');
-    d.className = 'log';
-    
-    if (logs[i].includes('SUCCESS')) d.classList.add('success-log');
-    if (logs[i].includes('WARNING')) d.classList.add('fail');
-    
-    d.textContent = logs[i];
-    logEl.appendChild(d);
-    logEl.scrollTop = logEl.scrollHeight;
-    
-    i++;
-    if (i === logs.length) {
-      clearInterval(interval);
-      setTimeout(() => next('success'), 1500);
-    }
-  }, 400);
-}
+let i = 0;
+let interval = setInterval(() => {
+let d = document.createElement('div');
+d.className = 'log';
+if (logs[i].includes('SUCCESS')) d.classList.add('success-log');
+if (logs[i].includes('WARNING')) d.classList.add('fail');
 
+d.textContent = logs[i];
+logEl.appendChild(d);
+logEl.scrollTop = logEl.scrollHeight;
+
+i++;
+if (i === logs.length) {
+  clearInterval(interval);
+  setTimeout(() => next('success'), 1500);
+}
+}, 350);
+}
 // ==========================================
 // DELIVERY TRACKING
 // ==========================================
-
 function trackDelivery() {
-  let santa = document.getElementById('santa2');
-  let prog = document.getElementById('deliveryProgress');
-  let status = document.getElementById('deliveryStatus');
-  let eta = document.getElementById('eta');
-  
-  let pos = 40;
-  let progress = 0;
-  let time = 18;
-  
-  let interval = setInterval(() => {
-    pos += 6;
-    progress += 2;
-    time -= 0.4;
-    
-    santa.style.left = pos + 'px';
-    prog.style.width = progress + '%';
-    eta.textContent = 'ETA: ' + Math.ceil(time) + ' minutes';
-    
-    if (progress === 25) status.textContent = 'Passing GS Road...';
-    if (progress === 50) status.textContent = 'Near Ganeshguri...';
-    if (progress === 75) status.textContent = 'Approaching Boldtek Office...';
-    
-    if (progress >= 100) {
-      clearInterval(interval);
-      status.textContent = '🎉 Santa has arrived!';
-      status.style.color = '#10b981';
-      eta.textContent = 'ETA: 0 minutes - ARRIVED!';
-      createConfetti();
-      setTimeout(() => next('arrival'), 2000);
-    }
-  }, 100);
-}
+let santa = document.getElementById('santa2');
+let prog = document.getElementById('deliveryProgress');
+let status = document.getElementById('deliveryStatus');
+let eta = document.getElementById('eta');
+let startPos = window.innerWidth > 768 ? 40 : 30;
+let maxPos = window.innerWidth > 768 ? 340 : window.innerWidth > 480 ? 260 : 210;
+let pos = startPos;
+let progress = 0;
+let time = 18;
+let interval = setInterval(() => {
+let increment = (maxPos - startPos) / 50;
+pos += increment;
+progress += 2;
+time -= 0.4;
+santa.style.left = pos + 'px';
+prog.style.width = progress + '%';
+eta.textContent = 'ETA: ' + Math.ceil(time) + ' minutes';
 
+if (progress === 25) status.textContent = 'Passing GS Road...';
+if (progress === 50) status.textContent = 'Near Ganeshguri...';
+if (progress === 75) status.textContent = 'Approaching Boldtek Office...';
+
+if (progress >= 100) {
+  clearInterval(interval);
+  status.textContent = '🎉 Santa has arrived!';
+  status.style.color = '#10b981';
+  eta.textContent = 'ETA: 0 minutes - ARRIVED!';
+  createConfetti();
+  setTimeout(() => next('arrival'), 2000);
+}
+}, 100);
+}
 // ==========================================
 // CONFETTI CELEBRATION
 // ==========================================
-
 function createConfetti() {
-  let colors = ['#ef4444', '#10b981', '#3b82f6', '#f59e0b', '#ec4899'];
-  for (let i = 0; i < 50; i++) {
-    setTimeout(() => {
-      let conf = document.createElement('div');
-      conf.className = 'confetti';
-      conf.style.left = Math.random() * 100 + '%';
-      conf.style.background = colors[Math.floor(Math.random() * colors.length)];
-      conf.style.animationDuration = (Math.random() * 2 + 2) + 's';
-      document.body.appendChild(conf);
-      setTimeout(() => conf.remove(), 4000);
-    }, i * 50);
-  }
+let colors = ['#ef4444', '#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6'];
+for (let i = 0; i < 60; i++) {
+setTimeout(() => {
+let conf = document.createElement('div');
+conf.className = 'confetti';
+conf.style.left = Math.random() * 100 + '%';
+conf.style.background = colors[Math.floor(Math.random() * colors.length)];
+conf.style.animationDuration = (Math.random() * 2 + 2) + 's';
+conf.style.animationDelay = (Math.random() * 0.3) + 's';
+document.body.appendChild(conf);
+setTimeout(() => conf.remove(), 5000);
+}, i * 40);
 }
+}
+// Prevent zoom on double tap (iOS)
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function (event) {
+let now = (new Date()).getTime();
+if (now - lastTouchEnd <= 300) {
+event.preventDefault();
+}
+lastTouchEnd = now;
+}, false);
 </script>
 </body>
-</html>
+</html></parameter><!DOCTYPE html>
+<html lang="en">    
